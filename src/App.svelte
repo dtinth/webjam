@@ -3,20 +3,9 @@
 
   import { connect, connectionStatus, onData, peer, send } from "./rtc";
   import { Buffer } from "buffer";
-  import { CRC } from "./crc";
   import consola from "consola";
   import { getBlankAudioPacket, submitOpusPacket } from "./audio";
   import { ProtocolMessage } from "./protocol";
-
-  const crc = new CRC();
-  function crcOf(packet: Buffer): number {
-    crc.reset();
-    let max = packet.length - 2;
-    for (let i = 0; i < max; i++) {
-      crc.update(packet[i]);
-    }
-    return crc.finalize();
-  }
 
   let lastChannelIds = [];
   let debugInfo = "Debug info";
@@ -107,12 +96,6 @@
           data.writeUInt16LE(2, 11); // Opus
           data.writeUInt16LE(1, 13); // Add sequence number support
           consola.log("[21] Sending network transport properties");
-          console.log(
-            new ProtocolMessage(20) // Network transport properties
-              .add(data)
-              .getBuffer()
-              .toString("hex")
-          );
           send(
             new ProtocolMessage(20) // Network transport properties
               .add(data)
